@@ -563,7 +563,7 @@ io.on('connection', (socket) => {
 }); // end of io.on connection
 
 // [修正] server.listen 必須移到 io.on 外面
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 伺服器啟動：http://localhost:${PORT}`);
 });
