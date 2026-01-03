@@ -1,0 +1,711 @@
+/* ===== 全域 ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC',
+    'Noto Sans TC', sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* 關鍵：防止整個網頁出現雙重捲軸 */
+}
+
+/* ===== 左側 Sidebar ===== */
+.sidebar {
+  width: 280px;
+  background: linear-gradient(180deg, #1f2937, #111827);
+  color: #e5e7eb;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sidebar hr {
+  border: none;
+  border-top: 1px solid #374151;
+  margin: 8px 0;
+}
+
+/* 房間列表 */
+.room-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.room-item {
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.room-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(2px);
+}
+
+/* 輸入區塊 */
+.user-block,
+.room-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.sidebar label {
+  color: #9ca3af;
+}
+
+.sidebar input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: #374151;
+  color: #fff;
+}
+
+.sidebar input::placeholder {
+  color: #9ca3af;
+}
+
+.sidebar button {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.sidebar button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.sidebar button + button {
+  margin-top: 6px;
+}
+
+/* ===== 右側聊天室 ===== */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 關鍵：強制聊天室撐滿高度，輸入框才會在最下面 */
+  background: #f9fafb;
+}
+
+/* Header */
+.chat-header {
+  padding: 14px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* 訊息區 */
+/* ========================================= */
+/* 👇 請替換原本所有 .message 相關的 CSS 👇 */
+/* ========================================= */
+
+.messages {
+  flex: 1;               /* 關鍵：這會佔滿剩餘空間，把輸入框推到底部 */
+  padding: 20px;
+  overflow-y: auto;      /* 讓訊息多了可以捲動 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+/* 每一行訊息的容器 */
+.message-row {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: flex-end; /* 讓頭貼和訊息底部對齊 */
+}
+
+/* --- 對方的訊息 (左側) --- */
+.message-row.other {
+  justify-content: flex-start;
+}
+
+/* --- 自己的訊息 (右側) --- */
+.message-row.self {
+  justify-content: flex-end;
+}
+
+/* 頭貼樣式 */
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px; /* 頭貼跟訊息的距離 */
+  background-color: #ddd;
+  flex-shrink: 0; /* 防止頭貼被擠扁 */
+}
+
+/* 訊息內容區塊 (包含暱稱、氣泡、時間) */
+.message-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+}
+
+/* 暱稱 (只在對方訊息顯示) */
+.message-nickname {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  margin-left: 2px;
+}
+
+/* 氣泡與時間的容器 (用來並排顯示) */
+.bubble-container {
+  display: flex;
+  align-items: flex-end; /* 時間沉在底部 */
+  gap: 6px; /* 氣泡跟時間的距離 */
+}
+
+/* 氣泡本體 */
+.message-bubble {
+  padding: 10px 14px;
+  border-radius: 20px; /* IG 風格的橢圓形 */
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+  position: relative;
+}
+
+/* 對方的氣泡顏色 */
+.message-row.other .message-bubble {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-bottom-left-radius: 4px; /* 左下角稍微尖一點 */
+}
+
+/* 自己的氣泡顏色 (維持你原本的藍色或綠色) */
+.message-row.self .message-bubble {
+  background: #3b82f6; /* 藍色 */
+  color: #ffffff;
+  border-bottom-right-radius: 4px; /* 右下角稍微尖一點 */
+}
+
+/* 時間文字 */
+.message-time {
+  font-size: 11px;
+  color: #9ca3af; /* 淺灰色 */
+  min-width: fit-content; /* 防止時間換行 */
+  margin-bottom: 2px; /* 微調高度 */
+}
+
+/* 自己的訊息，時間要排在氣泡左邊 (透過 flex-direction row-reverse 或 order 調整) */
+.message-row.self .bubble-container {
+  flex-direction: row-reverse; /* 讓時間跑到左邊 */
+}
+
+/* 圖片樣式 */
+.message-image {
+  max-width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+/* 檔案下載連結樣式 */
+.message-file-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.message-row.self .message-file-link { color: white; }
+.message-row.other .message-file-link { color: #2563eb; }
+
+/* 刪除按鈕 (隱藏式) */
+.delete-btn {
+  font-size: 10px;
+  color: #ef4444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.message-row:hover .delete-btn {
+  opacity: 1;
+}
+
+/* ===== 輸入區 ===== */
+.chat-input-area {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  flex-shrink: 0; /* 關鍵：防止輸入框被上面的訊息擠壓變形 */
+  z-index: 10;
+}
+
+.chat-input-area input[type='text'] {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.chat-input-area input[type='file'] {
+  font-size: 12px;
+}
+
+.chat-input-area button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #10b981;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-input-area button:hover {
+  background: #059669;
+}
+/* ===== Google 風格登入頁面 ===== */
+
+/* 滿版背景與置中容器 */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5; /* 淺灰背景 */
+}
+
+/* 白色卡片 */
+.auth-card {
+  background: #ffffff;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px; /* Google 常用的圓角 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0,0,0,0.08); /* 層次陰影 */
+  text-align: center;
+}
+
+/* 標題與副標 */
+.auth-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: #202124;
+}
+.auth-header p {
+  margin: 0 0 32px 0;
+  color: #5f6368;
+  font-size: 16px;
+}
+
+/* 輸入框群組 (Floating Label 效果) */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 15px;
+  font-size: 16px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  outline: none;
+  transition: border 0.2s;
+  background: transparent;
+  color: #202124;
+}
+
+/* 輸入框聚焦時變藍色 */
+.input-group input:focus {
+  border-color: #1a73e8; /* Google Blue */
+  border-width: 2px;
+  padding: 12px 14px; /* 補償 border 寬度變化 */
+}
+
+/* 浮動標籤 (模擬 Google 的效果) */
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 4px;
+  color: #5f6368;
+  font-size: 16px;
+  pointer-events: none; /* 讓點擊穿透到 input */
+  transition: 0.2s ease all;
+}
+
+/* 當輸入框 focus 或有內容時，標籤往上浮 */
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+  top: 0;
+  font-size: 12px;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+/* 按鈕樣式 */
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primary-btn:hover {
+  background-color: #1557b0;
+  box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+}
+
+/* 底部切換連結 */
+.auth-footer {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #5f6368;
+}
+
+.auth-footer a {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ========================================= */
+/* 👇 請將這段加在 style.css 的最下面 👇 */
+/* ========================================= */
+
+/* ===== Header 排版調整 ===== */
+.chat-header {
+  display: flex;
+  justify-content: space-between; /* 標題靠左，頭貼靠右 */
+  align-items: center;
+}
+
+/* 右上角圓形頭貼 */
+.user-menu img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* 圓形 */
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #e5e7eb;
+  transition: transform 0.2s;
+  background-color: #ddd; /* 圖片載入前的底色 */
+}
+
+.user-menu img:hover {
+  transform: scale(1.05);
+  border-color: #3b82f6;
+}
+
+/* ===== 彈出視窗 (Modal) ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 半透明黑底 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* 確保蓋在最上面 */
+}
+
+.modal-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-card h3 {
+  margin-top: 0;
+  color: #1f2937;
+}
+
+/* 頭貼預覽區 */
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-upload img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+}
+
+.upload-btn {
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 5px;
+}
+
+.upload-btn:hover {
+  text-decoration: underline;
+}
+
+/* Modal 按鈕區 */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #2563eb;
+}
+/* ===== 群組設定列表 ===== */
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+.member-name-group {
+  display: flex;
+  flex-direction: column;
+}
+.real-name {
+  font-size: 10px;
+  color: #999;
+}
+.nickname-input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+  width: 100px;
+  color: #333;
+}
+.admin-badge {
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+.kick-btn {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ===== 系統訊息 (置中灰色文字) ===== */
+/* ===== 系統訊息 (膠囊狀置中) ===== */
+.message-system {
+  /* 1. 關鍵：讓寬度自動適應文字長度 */
+  width: fit-content;
+  max-width: 85%;      /* 防止文字太長時撐爆畫面 */
+  
+  /* 2. 關鍵：在 Flex 排版中自動置中 */
+  align-self: center;
+  
+  /* 3. 外觀美化 */
+  margin: 10px 0;
+  text-align: center;
+  color: #6b7280;          /* 深一點的灰色，閱讀更清楚 */
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.06); /* 淺灰底色 */
+  
+  /* 4. 圓潤膠囊造型 */
+  padding: 4px 16px;       /* 上下窄，左右寬 */
+  border-radius: 50px;     /* 超大圓角，變成橢圓形 */
+  
+  /* 讓過長的文字能自動換行，不會跑版 */
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+/* 被選中的房間 */
+.room-item.active {
+  background: rgba(59, 130, 246, 0.2); /* 淡淡的藍色 */
+  border-left: 3px solid #3b82f6;
+}
+
+/* 返回按鈕滑鼠懸停效果 */
+#backToLobbyBtn:hover {
+  color: #3b82f6 !important; /* 變藍色 */
+  transform: translateX(-2px); /* 稍微往左動一下 */
+  transition: all 0.2s;
+}
+/* ========================================= */
+/* 👇 邀請通知視窗美化 (貼在 style.css 最下面) 👇 */
+/* ========================================= */
+
+/* 1. 調整邀請文字的排版 */
+#inviteText {
+  font-size: 16px;       /* 字體大一點比較清楚 */
+  color: #374151;        /* 深灰色，閱讀起來比較舒服 */
+  line-height: 1.6;      /* 行高增加，不要擠在一起 */
+  margin: 25px 0;        /* 上下留白 */
+}
+
+/* 強調文字 (例如邀請者的名字) */
+#inviteText strong {
+  color: #111827;        /* 接近黑色 */
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* 2. 拒絕按鈕 (紅色系) */
+#declineBtn {
+  background-color: #ef4444 !important; /* 紅色 */
+  color: white !important;
+  border: 1px solid #ef4444;
+  font-weight: 500;
+  padding: 8px 20px;
+  transition: all 0.2s;
+}
+
+#declineBtn:hover {
+  background-color: #dc2626 !important; /* 滑鼠移過去變深紅 */
+  opacity: 0.9;
+}
+
+/* 3. 加入按鈕 (綠色系 - 更顯眼) */
+#acceptBtn {
+  background-color: #10b981 !important; /* 綠色 */
+  color: white !important;
+  font-weight: 600;
+  padding: 8px 24px;       /* 比拒絕按鈕稍微寬一點 */
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); /* 加一點綠色陰影 */
+  transition: all 0.2s;
+}
+
+#acceptBtn:hover {
+  background-color: #059669 !important; /* 滑鼠移過去變深綠 */
+  transform: translateY(-2px); /* 稍微往上浮起的效果 */
+  box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.4);
+}
+
+/* 1. 針對圖片氣泡：移除背景色、移除內距、移除邊框 */
+.message-bubble.image-bubble {
+  background: transparent !important; /* 透明背景 */
+  padding: 0 !important;              /* 不要有留白 */
+  border: none !important;            /* 不要邊框 */
+  box-shadow: none !important;        /* 不要陰影 */
+}
+
+/* 2. 針對圖片本身：限制大小、圓角 */
+.message-image {
+  max-width: 250px;      /* 限制最大寬度 (你可以自己調整成 200px 或 300px) */
+  max-height: 300px;     /* 限制最大高度，避免長圖洗版 */
+  object-fit: cover;     /* 保持比例 */
+  border-radius: 12px;   /* 圓角 */
+  display: block;        /* 避免下方出現不明顯的空白 */
+  cursor: pointer;       /* 滑鼠移過去變手指，暗示可點擊 (未來可做點擊放大) */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* 給圖片一點點陰影比較有質感 */
+}

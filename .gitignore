@@ -1,0 +1,9 @@
+# 忽略所有 node_modules (不管在哪一層資料夾)
+node_modules/
+*/node_modules/
+
+# 忽略系統檔案 (Mac 電腦常會自動產生這個，建議忽略)
+.DS_Store
+
+# 忽略環境變數檔案 (這行最重要！保護密碼不外洩)
+.env

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>💬 即時聊天室</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="authPage" class="auth-container">
+  <div class="auth-card">
+    
+    <div class="auth-header">
+      <h2>歡迎使用聊天室</h2>
+      <p>            </p>
+    </div>
+
+    <div id="loginSection">
+      <div class="input-group">
+        <input id="emailInput" type="text" placeholder=" " required>
+        <label>Email 電子信箱</label>
+      </div>
+      <div class="input-group">
+        <input id="passwordInput" type="password" placeholder=" " required>
+        <label>密碼</label>
+      </div>
+      
+      <div class="auth-actions">
+        <button class="primary-btn" onclick="login()">登入</button>
+      </div>
+      
+      <div class="auth-footer">
+        <span>還沒有帳號？</span>
+        <a href="#" onclick="toggleAuthMode()">建立帳號</a>
+      </div>
+    </div>
+
+    <div id="registerSection" style="display: none;">
+      <div class="input-group">
+        <input id="regEmail" type="text" placeholder=" " required>
+        <label>Email 電子信箱</label>
+      </div>
+      <div class="input-group">
+        <input id="regPassword" type="password" placeholder=" " required>
+        <label>設定密碼</label>
+      </div>
+      <div class="input-group">
+        <input id="regNickname" type="text" placeholder=" " required>
+        <label>暱稱 (顯示名稱)</label>
+      </div>
+
+      <div class="auth-actions">
+        <button class="primary-btn" onclick="register()">註冊</button>
+      </div>
+
+      <div class="auth-footer">
+        <span>已經有帳號？</span>
+        <a href="#" onclick="toggleAuthMode()">直接登入</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <div class="app" id="chatPage" style="display:none">
+
+    
+    <!-- 左側：房間列表＋建立 / 加入房間 -->
+    <aside class="sidebar">
+      <h2>房間列表</h2>
+      <ul id="roomList" class="room-list"></ul>
+
+      <hr />
+
+
+
+      <div class="room-block">
+        <label>房間名稱：</label>
+        <input id="roomNameInput" type="text" placeholder="請輸入房間名稱" />
+
+        <label>房間密碼：</label>
+        <input id="roomPasswordInput" type="password" placeholder="請輸入密碼（可留空）" />
+
+        <button id="createRoomBtn">建立房間</button>
+        <button id="joinRoomBtn">加入房間</button>
+      </div>
+    </aside>
+
+    <!-- 右側：聊天室 -->
+    <main class="chat">
+      <header class="chat-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="backToLobbyBtn" style="display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">❮</button>
+
+           <h2 id="currentRoomTitle">目前尚未加入任何房間</h2>
+           <button id="roomSettingsBtn" style="display: none; background: none; border: none; font-size: 20px; cursor: pointer;">⚙️</button>
+        </div>
+        <div class="user-menu" style="display: none;" id="userMenu">
+          <img id="headerAvatar" src="" alt="User" onclick="openProfileModal()">
+        </div>
+      </header>
+
+      <section id="messages" class="messages"></section>
+
+      <footer class="chat-input-area">
+       <form id="chatForm" style="display: flex; gap: 8px; width: 100%;">
+        <input
+          id="messageInput"
+          type="text"
+          placeholder="輸入訊息後按 Enter 或點送出"
+          autocomplete="off"
+          style="flex: 1;"
+       />
+        <input id="imageInput" type="file" accept="image/*" />
+        <button id="sendBtn" type="submit">傳送</button>
+       </form>
+      </footer>
+
+    </main>
+  </div>
+
+  <div id="profileModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h3>編輯個人資料</h3>
+      
+      <div class="avatar-upload">
+        <img id="previewAvatar" src="">
+        <input id="avatarUpdateInput" type="file" accept="image/*" style="display: none;">
+        <button class="upload-btn" onclick="document.getElementById('avatarUpdateInput').click()">更換頭貼</button>
+      </div>
+
+      <div class="input-group" style="margin-top: 20px;">
+        <input id="editNickname" type="text" placeholder=" " required style="color:black; border: 1px solid #ccc;">
+        <label style="color:#666; background:white;">暱稱</label>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="closeProfileModal()" class="cancel-btn">取消</button>
+        <button onclick="saveProfile()" class="save-btn">儲存變更</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="groupSettingsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="width: 400px; max-height: 80vh; overflow-y: auto;">
+      <h3 id="settingsRoomTitle">群組設定</h3>
+      
+      <div class="group-actions" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+         <button onclick="leaveGroup()" style="background: #f59e0b; color: white; border:none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">退出聊天室</button>
+         <button id="deleteGroupBtn" onclick="deleteGroup()" style="background: #ef4444; color: white; border:none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: none;">解散聊天室</button>
+      </div>
+      <hr>
+      <div id="generalSettings" style="margin-bottom: 20px;"></div>
+      <h4>成員列表 (<span id="memberCount">0</span>)</h4>
+      <ul id="memberList" class="member-list"></ul>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button onclick="document.getElementById('groupSettingsModal').style.display='none'" class="primary-btn">關閉</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="inviteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="width: 320px; text-align: center;">
+      <h3>📩 收到邀請</h3>
+      <p id="inviteText" style="margin: 20px 0; color: #555; line-height: 1.5;">...</p>
+      
+      <div class="modal-actions" style="justify-content: center; gap: 15px;">
+        <button id="declineBtn" class="cancel-btn" style="background-color: #ef4444; color: white;">拒絕</button>
+        <button id="acceptBtn" class="save-btn" style="background-color: #10b981;">加入</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Socket.io client -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
