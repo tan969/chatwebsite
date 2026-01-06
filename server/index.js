@@ -127,6 +127,10 @@ app.post('/api/updateProfile', async (req, res) => {
   if (nickname) user.nickname = nickname;
   if (avatar !== undefined) user.avatar = avatar; 
   saveData(data);
+  io.emit('userAvatarUpdated', {
+  email: user.email,
+  avatar: user.avatar || null
+  });
   res.json({ 
     ok: true, 
     user: { email: user.email, nickname: user.nickname, avatar: user.avatar || null }
