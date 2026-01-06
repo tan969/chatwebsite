@@ -170,6 +170,7 @@ function addMessageToUI(message) {
   const row = document.createElement('div');
   row.className = `message-row ${isSelf ? 'self' : 'other'}`;
   row.dataset.id = message.id;
+  row.dataset.senderEmail = message.senderEmail;
 
   if (!isSelf) {
     const avatarImg = document.createElement('img');
@@ -427,6 +428,31 @@ async function saveProfile() {
 socket.on('roomInfoUpdated', ({ newName }) => {
     if (currentRoomTitle) currentRoomTitle.textContent = `目前房間：${newName}`;
     if (settingsRoomTitle) settingsRoomTitle.textContent = `群組設定：${newName}`;
+});
+
+// ===== 即時同步頭貼（更新舊訊息）=====
+socket.on('userAvatarUpdated', ({ email, avatar }) => {
+  const newAvatar = avatar || DEFAULT_AVATAR;
+
+  // 1️⃣ 更新聊天室中「已顯示的舊訊息」
+  document.querySelectorAll('.message-row').forEach(row => {
+    // 只處理別人的訊息（因為自己沒頭貼）
+    if (row.classList.contains('other')) {
+      const img = row.querySelector('.message-avatar');
+      if (!img) return;
+
+      // 利用 data-sender-email（下面會補）
+      if (row.dataset.senderEmail === email) {
+        img.src = newAvatar;
+      }
+    }
+  });
+
+  // 2️⃣ 如果是自己，也同步更新 Header
+  if (currentUser && currentUser.email === email) {
+    currentUser.avatar = avatar;
+    updateHeaderAvatar();
+  }
 });
 
 
